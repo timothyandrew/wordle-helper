@@ -39,11 +39,10 @@ function App() {
         <ul>
           {[0, 1, 2, 3, 4].map(i => {
             return (
-              <li key={i}>{i+1}: <input type="text" value={locked[i]} onChange={(e) => updateLocked(e, i)}></input></li>
+              <li key={i}>{i+1}: <input type="text" onChange={(e) => updateLocked(e, i)}></input></li>
             );
           })}
         </ul>
-        <p>{JSON.stringify(locked)}</p>
       </div>
 
       <div>
@@ -55,18 +54,14 @@ function App() {
             );
           })}
         </ul>
-        <p>{JSON.stringify(misplaced)}</p>
       </div>
-
 
       <div>
         <h1>Gray</h1>
         <ul>
           <input type="text" onChange={(e) => updateWrong(e)}></input>
         </ul>
-        <p>{JSON.stringify([...wrong])}</p>
       </div>
-
 
       <div>
         <ul>
@@ -76,6 +71,12 @@ function App() {
             and {words.length - MAX_WORDS} more...
           </div>}
         </ul>
+      </div>
+
+      <div>
+        <pre>
+          {JSON.stringify({locked: locked, misplaced: misplaced, wrong: wrong})}
+        </pre>
       </div>
     </div>
   );
