@@ -10,17 +10,17 @@ function App() {
   const MAX_WORDS = 20;
 
   const updateLocked = (e, i) => {
-    const value = e.target.value === "" ? null : e.target.value;
+    const value = e.target.value === "" ? null : e.target.value.toLowerCase();
     setLocked([0, 1, 2, 3, 4].map((mi) => mi === i ? value : locked[mi]));
   };
 
   const updateMisplaced = (e, i) => {
-    const value = e.target.value === "" ? null : e.target.value.split(",").map(v => v.trim()).filter(v => v !== "");
+    const value = e.target.value === "" ? null : e.target.value.split(",").map(v => v.trim().toLowerCase()).filter(v => v !== "");
     setMisplaced([0, 1, 2, 3, 4].map((mi) => mi === i ? value : misplaced[mi]));
   };
 
   const updateWrong = (e) => {
-    const values = e.target.value === "" ? [] : e.target.value.split(",").map(v => v.trim()).filter(v => v !== "");
+    const values = e.target.value === "" ? [] : e.target.value.split(",").map(v => v.trim().toLowerCase()).filter(v => v !== "");
     setWrong(new Set([...values]));
   };
 
