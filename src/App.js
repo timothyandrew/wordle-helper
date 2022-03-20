@@ -1,82 +1,54 @@
 import dict from './dict.json'
 import './App.css';
 import { useState } from 'react';
+import WordList from './WordList';
+import FilterList from './FilterList';
+import CommandArea from './CommandArea';
+import _ from 'lodash';
+
+const words = _.shuffle(dict);
 
 function App() {
-  const [locked, setLocked] = useState([null, null, null, null, null]);
-  const [misplaced, setMisplaced] = useState([null, null, null, null, null]);
-  const [wrong, setWrong] = useState(new Set());
+  const [filters, setFilters] = useState([]);
 
-  const MAX_WORDS = 20;
-
-  const updateLocked = (e, i) => {
-    const value = e.target.value === "" ? null : e.target.value.toLowerCase();
-    setLocked([0, 1, 2, 3, 4].map((mi) => mi === i ? value : locked[mi]));
+  const onCreateFilter = (letter, color, position) => {
+    setFilters([...filters, [letter.toLowerCase(), color, (position !== null) ? position - 1 : null]]);
   };
 
-  const updateMisplaced = (e, i) => {
-    const value = e.target.value === "" ? null : e.target.value.split(",").map(v => v.trim().toLowerCase()).filter(v => v !== "");
-    setMisplaced([0, 1, 2, 3, 4].map((mi) => mi === i ? value : misplaced[mi]));
-  };
+  const onDeleteFilter = (i) => {
+    setFilters(filters.filter((f, fi) => fi !== i));
+  }
 
-  const updateWrong = (e) => {
-    const values = e.target.value === "" ? [] : e.target.value.split(",").map(v => v.trim().toLowerCase()).filter(v => v !== "");
-    setWrong(new Set([...values]));
-  };
+  const filteredWords = filters.length === 0 ? words : words.filter(w => {
+    return filters.every(([letter, color, position]) => {
+      if (color === 'green') {
+        return w[position] === letter;
+      }
 
-  const words = dict.filter(w => {
-    const checkLocked = locked.every((l, i) => l === null || l[0] === w[i]);
-    const checkMisplaced = misplaced.every((m, i) => m === null || m.every(l => w[i] !== l[0] && w.includes(l[0])))
-    const checkWrong = [...wrong].every(l => !w.includes(l[0]));
+      if (color === 'yellow') {
+        return w[position] !== letter && w.includes(letter);
 
-    return checkLocked && checkMisplaced && checkWrong;
+      }
+
+      if (color === 'gray') {
+        return !w.includes(letter);
+      }
+
+      console.error("PANIC");
+      return true;
+    });
   });
 
+
+
   return (
-    <div>
-      <div>
-        <h1>Green</h1>
-        <ul>
-          {[0, 1, 2, 3, 4].map(i => {
-            return (
-              <li key={i}>{i+1}: <input type="text" onChange={(e) => updateLocked(e, i)}></input></li>
-            );
-          })}
-        </ul>
+    <div className="container mx-auto px-2 flex flex-col h-screen">
+      <div className="flex flex-row justify-around h-3/5 overflow-scroll">
+        <WordList words={filteredWords} />
+        <FilterList filters={filters} onDeleteFilter={onDeleteFilter} />
       </div>
-
-      <div>
-        <h1>Yellow</h1>
-        <ul>
-          {[0, 1, 2, 3, 4].map(i => {
-            return (
-              <li key={i}>{i+1}: <input type="text" onChange={(e) => updateMisplaced(e, i)}></input></li>
-            );
-          })}
-        </ul>
-      </div>
-
-      <div>
-        <h1>Gray</h1>
-        <ul>
-          <input type="text" onChange={(e) => updateWrong(e)}></input>
-        </ul>
-      </div>
-
-      <div>
-        <ul>
-          {words.slice(0, MAX_WORDS).map(w => <li key={w}>{w}</li>)}
-
-          {words.length > MAX_WORDS && <div>
-            and {words.length - MAX_WORDS} more...
-          </div>}
-        </ul>
-      </div>
-
-      <div>
-        <pre>
-          {JSON.stringify({locked: locked, misplaced: misplaced, wrong: wrong})}
-        </pre>
+      <div className="">
+        <CommandArea onCreateFilter={onCreateFilter} />
       </div>
     </div>
   );
